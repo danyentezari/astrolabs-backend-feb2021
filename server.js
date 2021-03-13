@@ -56,8 +56,11 @@ server.use(
     users
 )
 
+// Use Heroku port number if it exists otherwise use 3001
+const port = process.env.PORT || 3001;
+
 server.listen(
-    3001, 
+    port, 
     () => {
         console.log('(2) server is running on http://localhost:3001')
     }
