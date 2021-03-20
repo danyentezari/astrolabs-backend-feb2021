@@ -2,6 +2,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const products = require('./routes/products.js');
 const users = require('./routes/users.js');
 
@@ -31,6 +32,8 @@ mongoose
         }
     )
 
+// Tell express to allow CORS (Cross-Origin Resource Sharing)
+server.use(cors());    
 
 // Tell express how to use body-parser
 server.use( bodyParser.urlencoded({ extended: false }) );
@@ -58,7 +61,6 @@ server.use(
 
 // Use Heroku port number if it exists otherwise use 3001
 const port = process.env.PORT || 3001;
-
 server.listen(
     port, 
     () => {
