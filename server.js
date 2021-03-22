@@ -2,7 +2,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const expressFormData = require('express-form-data');
 const cors = require('cors');
+const cloudinary = require('cloudinary').v2;
 const products = require('./routes/products.js');
 const users = require('./routes/users.js');
 
@@ -32,6 +34,15 @@ mongoose
         }
     )
 
+// Configure for Cloudinary
+cloudinary.config(
+    {
+        cloud_name: process.env.CLOUD_NAME,
+        api_key: process.env.API_KEY,
+        api_secret: process.env.API_SECRET
+    }
+)
+
 // Tell express to allow CORS (Cross-Origin Resource Sharing)
 server.use(cors());    
 
@@ -40,6 +51,9 @@ server.use( bodyParser.urlencoded({ extended: false }) );
 
 // Also tell express to recognize JSON
 server.use( bodyParser.json() );
+
+// Also tell express to read HTTP form data
+server.use(expressFormData.parse());
 
 // Create a Route
 server.get(
