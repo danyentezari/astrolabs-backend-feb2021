@@ -8,6 +8,51 @@ const cloudinary = require('cloudinary').v2;
 const products = require('./routes/products.js');
 const users = require('./routes/users.js');
 
+// Import passport
+const passport = require('passport');
+// Import the strategies & way to extract the jsonwebtoken
+const JwtStrategy = require('passport-jwt').Strategy;
+const ExtractJwt = require('passport-jwt').ExtractJwt;
+
+// The same secret in routes/UsersRoutes will be needed
+// to read the jsonwebtoken
+const secret = process.env.SECRET;
+
+// Options for passport-jwt
+const passportJwtOptions = {
+    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+    secretOrKey: secret
+};
+
+// This function is what will read the contents (payload) of the jsonwebtoken
+const passportJwt = (passport) => {
+    passport.use(
+        new JwtStrategy(
+            passportJwtOptions, 
+            (jwtPayload, done) => {
+
+                // Extract and find the user by their id (contained jwt)
+                UsersModel.findOne({ _id: jwtPayload.id })
+                .then(
+                    // If the document was found
+                    (document) => {
+                        return done(null, document);
+                    }
+                )
+                .catch(
+                    // If something went wrong with database search
+                    (err) => {
+                        return done(null, null);
+                    }
+                )
+            }
+        )
+    )
+};
+
+// Invoke passportJwt and pass the passport npm package as argument
+passportJwt(passport);
+
 // A package that allows express to read environment variables (like CONNECTION_STRING)
 require('dotenv').config();
 
@@ -65,6 +110,7 @@ server.get(
 
 server.use(
     '/product', //http://www.myapp.com/product/
+    //passport.authenticate('jwt', {session:false}),
     products
 )
 
